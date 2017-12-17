@@ -1,27 +1,44 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace SlackApi.Methods
 {
-    public class ReactionsAddMethod : IMethod
+    public class ReactionsAddMethod : Method
     {
         public ReactionsAddMethod(string reactionName)
         {
             Parameters.Add(new KeyValuePair<string, string>("name", reactionName));
         }
 
-        public List<KeyValuePair<string, string>> Parameters => new List<KeyValuePair<string, string>>();
+        public string Channel 
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("channel", value));
+            }
+        }
 
-        [JsonProperty("channel")]
-        public string Channel { get; set; }
+        public string File 
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("file", value));
+            }
+        }
 
-        [JsonProperty("file")]
-        public string File { get; set; }
+        public string FileComment 
+        { 
+            set
+            {   
+                Parameters.Add(new KeyValuePair<string, string>("file_comment", value));
+            }
+        }
 
-        [JsonProperty("file_comment")]
-        public string FileComment { get; set; }
-
-        [JsonProperty("timestamp")]
-        public string Ts { get; set; }
+        public string Ts 
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("timestamp", value));
+            }
+        }
     }
 }

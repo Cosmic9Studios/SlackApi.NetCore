@@ -2,8 +2,14 @@ using System.Collections.Generic;
 
 namespace SlackApi.Methods
 {
-    public class ConversationsListMethod : IMethod 
+    public class ConversationsListMethod : Method 
     { 
-        public List<KeyValuePair<string, string>> Parameters => new List<KeyValuePair<string, string>>();
+        public string Types
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("types", value));
+            }
+        }
     }
 }
