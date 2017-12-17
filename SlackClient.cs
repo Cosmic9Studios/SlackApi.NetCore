@@ -20,7 +20,6 @@ namespace SlackApi
         ///
         //////////////////////////////////
         private RestClient restClient;
-        private string token;
         private PureWebSocket slackSocket;
         private Dictionary<string, KeyValuePair<Type, Delegate>> eventCallbacks;
         #endregion
@@ -36,6 +35,13 @@ namespace SlackApi
         }
         #endregion
 
+        #region Public Properties.
+        /// <summary>
+        /// Gets and sets the token used by methods for authentication.
+        /// </summary>
+        public string Token { get; set; }
+        #endregion
+
         #region ISlackClient Interface.
         /// <summary>
         /// Connects to the slack client.
@@ -43,7 +49,7 @@ namespace SlackApi
         /// <param name="token">The token used to identify the user.</param>
         public async Task<ConnectResponse> Connect(string token)
         {
-            this.token = token;
+            Token = token;
             var connectionResponse = await CallApiMethod<ConnectResponse>(new RtmConnectMethod());
             if (connectionResponse.Ok)
             {
@@ -59,18 +65,27 @@ namespace SlackApi
         }
 
         /// <summary>
+        /// Disconnects from the slack api.
+        /// </summary>
+        public void Disconnect()
+        {
+            slackSocket.Disconnect();
+            eventCallbacks = null;
+        }
+
+        /// <summary>
         /// Calls a web api method.
         /// </summary>
         /// <param name="methodName">The name of the method to invoke.</param>
         /// <param name="parameters">The parameters to pass to the method.</param>
-        public async Task<T> CallApiMethod<T>(IMethod method) where T: Response
+        public async Task<T> CallApiMethod<T>(Methods.Method method) where T: Response
         {
             string methodName = GetTypeIdentifier(method.GetType());
 
             return await Task.Run(() =>
             {
                 var request = new RestRequest($"{methodName}");
-                request.AddParameter("token", token);
+                request.AddParameter("token", Token);
                 foreach (var parameter in method.Parameters)
                 {
                     request.AddParameter(parameter.Key, parameter.Value);
@@ -95,18 +110,21 @@ namespace SlackApi
         #region Private Methods. 
         private string GetTypeIdentifier(Type type)
         {
+            bool isEvent = (type.IsSubclassOf(typeof(Event)));
+            bool isMethod = (type.IsSubclassOf(typeof(Methods.Method)));
+
             string identity = ""; 
             List<string> split =  new List<string>(Regex.Split(type.Name, @"(?<!^)(?=[A-Z])"));
 
             var lastWord = split.LastOrDefault();
-            if (lastWord != null && lastWord == type.BaseType.Name.ToString())
+            if (lastWord != null && (isEvent || isMethod))
             {
                 split.RemoveAt(split.Count - 1);
             }
             
             foreach (var name in split)
             {
-                identity += name.ToLower() + (type.IsSubclassOf(typeof(Event)) ? "_" : ".");
+                identity += name.ToLower() + (isEvent ? "_" : ".");
             }
 
             identity = identity.Substring(0, identity.Length - 1);
@@ -128,6 +146,11 @@ namespace SlackApi
         private void Ws_OnMessage(string message)
         {
             var slackEvent = JsonConvert.DeserializeObject<Event>(message); 
+            if (slackEvent.type == null)
+            {
+                return;
+            }
+
             if (eventCallbacks.TryGetValue(slackEvent.type, out var callback))
             {
                 object eventData = JsonConvert.DeserializeObject(message, callback.Key);
