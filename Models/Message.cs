@@ -31,5 +31,23 @@ namespace SlackApi.Models
 
         [JsonProperty("subtype")]
         public string SubType { get; set; }
+
+        [JsonProperty("reply_count")]
+        public long? ReplyCount { get; set; }
+
+        [JsonProperty("replies")]
+        public List<Reply> Replies { get; set; }
+
+        [JsonProperty("subscribed")]
+        public bool? Subscribed { get; set; }
+
+        [JsonProperty("last_read")]
+        public string LastRead { get; set; }
+
+        [JsonProperty("unread_count")]
+        public long? UnreadCount { get; set; }
+
+        [JsonProperty("parent_user_id")]
+        public string ParentUserId { get; set; }
     }
 }
