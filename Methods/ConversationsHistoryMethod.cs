@@ -8,5 +8,13 @@ namespace SlackApi.Methods
         {
             Parameters.Add(new KeyValuePair<string, string>("channel", channel));
         }
+
+        public int Limit
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("limit", value.ToString()));
+            }
+        }
     }
 }
