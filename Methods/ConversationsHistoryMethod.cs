@@ -16,5 +16,21 @@ namespace SlackApi.Methods
                 Parameters.Add(new KeyValuePair<string, string>("limit", value.ToString()));
             }
         }
+
+        public string Latest
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("latest", value));
+            }
+        }
+
+        public bool Inclusive
+        {
+            set
+            {
+                Parameters.Add(new KeyValuePair<string, string>("inclusive", value.ToString()));
+            }
+        }
     }
 }

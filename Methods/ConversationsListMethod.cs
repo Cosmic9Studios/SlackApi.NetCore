@@ -8,7 +8,7 @@ namespace SlackApi.Methods
         {
             set
             {
-                Parameters.Add(new KeyValuePair<string, string>("types", value));
+                Parameters.Add(new KeyValuePair<string, string>("types", value)); // limit 100 
             }
         }
     }
