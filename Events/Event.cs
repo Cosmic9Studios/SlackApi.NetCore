@@ -1,7 +1,10 @@
+using Newtonsoft.Json;
+
 namespace SlackApi.Events
 {
     public class Event
     {
-        public string type;
+        [JsonProperty("type")]
+        public string Type;
     }
 }
