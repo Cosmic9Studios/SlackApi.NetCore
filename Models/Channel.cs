@@ -76,5 +76,11 @@ namespace SlackApi.Models
 
         [JsonProperty("num_members")]
         public long NumMembers { get; set; }
+
+        [JsonProperty("last_read")]
+        public string LastRead { get; set; }
+
+        [JsonProperty("latest")]
+        public Latest Latest { get; set; }
     }
 }
