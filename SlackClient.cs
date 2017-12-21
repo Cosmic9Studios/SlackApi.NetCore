@@ -88,6 +88,10 @@ namespace SlackApi
                 request.AddParameter("token", Token);
                 foreach (var parameter in method.Parameters)
                 {
+                    if (parameter.Key == null || parameter.Value == null)
+                    {
+                        continue;
+                    }
                     request.AddParameter(parameter.Key, parameter.Value);
                 }
                 var result = restClient.Execute(request);
@@ -104,6 +108,16 @@ namespace SlackApi
         {
             var eventName = GetTypeIdentifier(typeof(T));
             eventCallbacks[eventName] = new KeyValuePair<Type, Delegate>(typeof(T), callback);
+        }
+
+        /// <summary>
+        /// Unbinds a bound event.
+        /// </summary>
+        /// <param name="callback">The callback to unbind.</param>
+        public void UnbindEvent<T>() where T : Event
+        {
+            var eventName = GetTypeIdentifier(typeof(T));
+            eventCallbacks.Remove(eventName);
         }
         #endregion
 
@@ -146,12 +160,12 @@ namespace SlackApi
         private void Ws_OnMessage(string message)
         {
             var slackEvent = JsonConvert.DeserializeObject<Event>(message); 
-            if (slackEvent.type == null)
+            if (slackEvent.Type == null)
             {
                 return;
             }
 
-            if (eventCallbacks.TryGetValue(slackEvent.type, out var callback))
+            if (eventCallbacks.TryGetValue(slackEvent.Type, out var callback))
             {
                 object eventData = JsonConvert.DeserializeObject(message, callback.Key);
                 callback.Value.DynamicInvoke(eventData);
