@@ -28,8 +28,9 @@ namespace SlackApi
         /// <summary>
         /// Initializes a new instance of the <see cref="SlackClient" /> class.
         /// </summary>
-        public SlackClient()
+        public SlackClient(string token)
         {
+            Token = token;
             restClient = new RestClient("https://slack.com/api");
             eventCallbacks = new Dictionary<string, KeyValuePair<Type, Delegate>>();
         }
@@ -47,9 +48,8 @@ namespace SlackApi
         /// Connects to the slack client.
         /// </summary>
         /// <param name="token">The token used to identify the user.</param>
-        public async Task<ConnectResponse> Connect(string token)
+        public async Task<ConnectResponse> Connect()
         {
-            Token = token;
             var connectionResponse = await CallApiMethod<ConnectResponse>(new RtmConnectMethod());
             if (connectionResponse.Ok)
             {
@@ -82,10 +82,15 @@ namespace SlackApi
         {
             string methodName = GetTypeIdentifier(method.GetType());
 
-            return await Task.Run(() =>
+            Func<T> task = () =>
             {
                 var request = new RestRequest($"{methodName}");
-                request.AddParameter("token", Token);
+
+                if (!String.IsNullOrEmpty(Token))
+                {
+                    request.AddParameter("token", Token);
+                }
+
                 foreach (var parameter in method.Parameters)
                 {
                     if (parameter.Key == null || parameter.Value == null)
@@ -97,7 +102,17 @@ namespace SlackApi
                 var result = restClient.Execute(request);
                 
                 return JsonConvert.DeserializeObject<T>(result.Content); 
-            });
+            };
+
+            var taskResponse = Task.Factory.StartNew(task).Result;
+
+            while (taskResponse.Error == "ratelimited")
+            {
+                await Task.Delay(500);
+                taskResponse = Task.Factory.StartNew(task).Result;
+            }
+
+            return taskResponse;
         }
 
         /// <summary>

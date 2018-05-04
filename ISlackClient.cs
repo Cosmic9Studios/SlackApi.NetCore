@@ -12,8 +12,7 @@ namespace SlackApi
         /// <summary>
         /// Connects to the slack api.
         /// </summary>
-        /// <param name="token">The token used to identify the user.</param>
-        Task<ConnectResponse> Connect(string token);
+        Task<ConnectResponse> Connect();
 
         /// <summary>
         /// Disconnects from the slack api.
