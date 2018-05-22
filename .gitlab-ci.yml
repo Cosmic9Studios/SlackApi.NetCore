@@ -23,7 +23,7 @@ build-and-pack:
  artifacts:
   paths:
     - ./nuget
-  only:
+ only:
     - master@cosmic9studios/SlackApi
 
 publish: 
@@ -36,7 +36,8 @@ publish:
   when: manual
   allow_failure: false
   only:
-    - tags
+    refs:
+      - tags
     variables:
       - $NUGET_KEY
  
