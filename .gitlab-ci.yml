@@ -47,8 +47,7 @@ publish:
   variables:
     GIT_STRATEGY: none
   script: 
-    - 'ls'
-    - 'dotnet nuget push ./SlackApi.NetCore.*.nupkg -k $NUGET_KEY -s nuget.org'
+    - 'dotnet nuget push ./nuget/SlackApi.NetCore.*.nupkg -k $NUGET_KEY -s nuget.org'
   when: manual
   allow_failure: false
   only:
