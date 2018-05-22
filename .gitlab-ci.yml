@@ -2,7 +2,7 @@ stages:
   - pack
   - publish
 
-build-and-pack: 
+build-and-pack-beta: 
  image: microsoft/dotnet:2.0.0-sdk
  stage: pack
  script:
@@ -15,7 +15,7 @@ build-and-pack:
   except:
     - master@cosmic9studios/SlackApi
 
-build-and-pack: 
+build-and-pack-prod: 
  image: microsoft/dotnet:2.0.0-sdk
  stage: pack
  script:
