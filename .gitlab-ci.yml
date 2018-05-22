@@ -10,9 +10,9 @@ build-and-pack-beta:
  artifacts:
   paths:
     - ./nuget
-  only: 
+ only: 
     - branches
-  except:
+ except:
     - master@cosmic9studios/SlackApi
 
 build-and-pack-prod: 
@@ -40,9 +40,3 @@ publish:
       - tags
     variables:
       - $NUGET_KEY
- 
-
-      
-  
-  
-  
