@@ -18,8 +18,6 @@ build-and-pack:
 build-and-pack: 
  image: microsoft/dotnet:2.0.0-sdk
  stage: pack
- variables:
-    GIT_STRATEGY: none
  script:
   - 'dotnet pack -c Release -o ./nuget'
  artifacts:
