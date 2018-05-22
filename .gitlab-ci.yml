@@ -10,6 +10,8 @@ build-and-pack:
  artifacts:
   paths:
     - ./nuget
+  only: 
+    - branches
   except:
     - master@cosmic9studios/SlackApi
 
