@@ -36,5 +36,5 @@ publish:
   when: manual
   allow_failure: false
   only:
-    variables:
-      - $NUGET_KEY
+    refs:
+      - tags
