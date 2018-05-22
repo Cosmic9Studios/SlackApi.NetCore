@@ -1,0 +1,42 @@
+stages: 
+  - pack
+  - publish
+
+build-and-pack-beta: 
+ image: microsoft/dotnet:2.0.0-sdk
+ stage: pack
+ script:
+  - 'dotnet pack -c Release -o ./nuget --version-suffix "beta"'
+ artifacts:
+  paths:
+    - ./nuget
+ only: 
+    - branches
+ except:
+    - master@cosmic9studios/SlackApi
+
+build-and-pack-prod: 
+ image: microsoft/dotnet:2.0.0-sdk
+ stage: pack
+ script:
+  - 'dotnet pack -c Release -o ./nuget'
+ artifacts:
+  paths:
+    - ./nuget
+ only:
+    - master@cosmic9studios/SlackApi
+
+publish: 
+  image: microsoft/dotnet:2.0.0-sdk
+  stage: publish
+  variables:
+    GIT_STRATEGY: none
+  script: 
+    - 'dotnet nuget push ./nuget/SlackApi.NetCore.*.nupkg -k $NUGET_KEY -s nuget.org'
+  when: manual
+  allow_failure: false
+  only:
+    refs:
+      - tags
+    variables:
+      - $NUGET_KEY
