@@ -1,3 +1,5 @@
+include: 'https://gitlab.com/cosmic9studios/deployment/raw/master/templates/nuget/pack_with_suffix.yml'
+
 stages: 
   - build
   - pack
@@ -16,7 +18,16 @@ build:
   except: 
     - tags
 
-build-and-pack-beta: 
+pack_with_suffix:
+  stage: pack
+  variables: 
+    VERSION: $CI_COMMIT_TAG
+    VERSION_SUFFIX: beta
+  only:
+    - tags
+
+
+.build-and-pack-beta: 
   image: microsoft/dotnet:2.0.0-sdk
   stage: pack
   script:
@@ -29,7 +40,7 @@ build-and-pack-beta:
   except:
     - master@cosmic9studios/SlackApi
 
-build-and-pack-prod: 
+.build-and-pack-prod: 
   image: microsoft/dotnet:2.0.0-sdk
   stage: pack
   script:
@@ -41,7 +52,7 @@ build-and-pack-prod:
     - master@cosmic9studios/SlackApi
     - tags
 
-publish: 
+.publish: 
   image: microsoft/dotnet:2.0.0-sdk
   stage: publish
   variables:
