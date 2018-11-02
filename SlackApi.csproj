@@ -2,6 +2,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>SlackApi.NetCore</PackageId>
+    <Authors>Peter Henry; Grayson Powers</Authors>
+    <Company>Cosmic9 Studios</Company>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="PureWebSockets" Version="2.0.1" />
