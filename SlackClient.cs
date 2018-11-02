@@ -53,7 +53,7 @@ namespace SlackApi
             var connectionResponse = await CallApiMethod<ConnectResponse>(new RtmConnectMethod());
             if (connectionResponse.Ok)
             {
-                slackSocket = new PureWebSocket(connectionResponse.Url, new ReconnectStrategy(10000, 60000, 10));
+                slackSocket = new PureWebSocket(connectionResponse.Url, new ReconnectStrategy(10000, 60000));
                 slackSocket.OnStateChanged += Ws_OnStateChanged;
                 slackSocket.OnMessage += Ws_OnMessage;
                 slackSocket.OnClosed += Ws_OnClosed;
