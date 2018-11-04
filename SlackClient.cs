@@ -108,6 +108,7 @@ namespace SlackApi
 
             while (taskResponse.Error == "ratelimited")
             {
+                System.Console.WriteLine("Rate Limit Reached");
                 await Task.Delay(500);
                 taskResponse = await task;
             }
