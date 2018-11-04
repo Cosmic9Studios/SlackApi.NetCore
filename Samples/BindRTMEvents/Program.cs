@@ -7,10 +7,10 @@ namespace BindRTMEvents
 {
     class Program
     {
-        static void Main(string[] args)
+        static async void Main(string[] args)
         {
             var slackClient = new SlackClient("Slack User Token");
-            var connectionResponse = Task.Run(() => slackClient.Connect()).Result;
+            var connectionResponse = await slackClient.Connect();
 
             if (connectionResponse.Ok)
             {

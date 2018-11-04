@@ -15,7 +15,7 @@ namespace CallAPIMethods
             {
                 RedirectUri = "Slack app authorized redirect URL"
             };
-            var slackClient = Task.Run(() => AuthorizeClient(oauthAccessMethod)).Result;
+            var slackClient = await AuthorizeClient(oauthAccessMethod);
 
             Task.Run(() => TestAuth(slackClient));
 
