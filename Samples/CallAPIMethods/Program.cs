@@ -8,7 +8,7 @@ namespace CallAPIMethods
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var tempAuthCode = "Temporary authorization code given by Slack when a user authorizes your app";
             var oauthAccessMethod = new OauthAccessMethod("Slack app client ID", "Slack app client secret", tempAuthCode)
@@ -17,7 +17,7 @@ namespace CallAPIMethods
             };
             var slackClient = await AuthorizeClient(oauthAccessMethod);
 
-            Task.Run(() => TestAuth(slackClient));
+            await TestAuth(slackClient);
 
             Console.Read();
         }

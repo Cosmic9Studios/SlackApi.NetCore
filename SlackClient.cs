@@ -104,13 +104,12 @@ namespace SlackApi
                 return JsonConvert.DeserializeObject<T>(result.Content); 
             };
 
-            var taskResponse = await task;
-
+            var taskResponse = task();
             while (taskResponse.Error == "ratelimited")
             {
                 System.Console.WriteLine("Rate Limit Reached");
                 await Task.Delay(500);
-                taskResponse = await task;
+                taskResponse = task();
             }
 
             return taskResponse;
