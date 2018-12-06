@@ -24,8 +24,8 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: push
-    nuGetFeedType: external
-    publishFeedCredentials: 'Nuget Official'
+    nuGetFeedType: NuGet
+    publishFeedCredentials: 'NugetOfficial'
     versioningScheme: byBuildNumber
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
