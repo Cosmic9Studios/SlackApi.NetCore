@@ -26,7 +26,7 @@ steps:
     minorVersion: '$(Minor)'
   
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     command: push
