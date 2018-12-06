@@ -11,5 +11,8 @@ namespace SlackApi.Responses
 
         [JsonProperty("scope")]
         public string Scope { get; set; }
+
+        [JsonProperty("team_id")]
+        public string TeamId { get; set; }
     }
 }
