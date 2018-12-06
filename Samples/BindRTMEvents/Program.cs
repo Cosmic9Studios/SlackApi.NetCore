@@ -2,18 +2,27 @@
 using System.Threading.Tasks;
 using SlackApi;
 using SlackApi.Events;
+using SlackApi.Methods;
+using SlackApi.Responses;
 
 namespace BindRTMEvents
 {
     class Program
     {
-        static async void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var slackClient = new SlackClient("Slack User Token");
-            var connectionResponse = await slackClient.Connect();
+            var oauthAccessMethod = new OauthAccessMethod("Slack app client ID", "Slack app client secret", "temp auth code")
+            {
+                RedirectUri = "Slack app authorized redirect URL"
+            };
+
+            var webClient = await SlackWebClientFactory.CreateWebClient("userId", oauthAccessMethod);
+            var connectionResponse = await webClient.CallApiMethod<ConnectResponse>(new RtmConnectMethod());
+            var slackClient = new SlackRtmClient();
 
             if (connectionResponse.Ok)
             {
+                slackClient.Connect(connectionResponse.Url);
                 slackClient.BindEvent<ReactionAddedEvent>(ReactionAddedCallback);
                 slackClient.BindEvent<ReactionRemovedEvent>(ReactionRemovedCallback);
 
