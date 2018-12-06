@@ -7,6 +7,7 @@
     <PackageId>SlackApi.NetCore</PackageId>
     <Authors>Peter Henry; Grayson Powers</Authors>
     <Company>Cosmic9 Studios</Company>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

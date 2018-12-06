@@ -18,7 +18,6 @@ namespace SlackApi.Clients
         ///
         //////////////////////////////////
         private RestClient restClient;
-        private PureWebSocket slackSocket;
         private SlackUser user;
         // [TeamId:MethodName][{current time, target time}]
         private static Dictionary<string, KeyValuePair<Stopwatch, int>> blockedMethods;

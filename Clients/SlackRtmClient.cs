@@ -16,7 +16,6 @@ namespace SlackApi.Clients
         #region Fields.
         ///
         //////////////////////////////////
-        private RestClient restClient;
         private PureWebSocket slackSocket;
         private Dictionary<string, KeyValuePair<Type, Delegate>> eventCallbacks;
         private bool isActive = false;

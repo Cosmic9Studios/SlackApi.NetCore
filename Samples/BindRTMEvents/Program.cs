@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SlackApi;
+using SlackApi.Clients;
 using SlackApi.Events;
 using SlackApi.Methods;
 using SlackApi.Responses;

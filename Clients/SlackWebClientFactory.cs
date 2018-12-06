@@ -6,7 +6,7 @@ using SlackApi.Responses;
 
 namespace SlackApi.Clients
 {
-    public class SlackWebClientFactory
+    public static class SlackWebClientFactory
     {
         public static async Task<SlackWebClient> CreateWebClient(string userId, OauthAccessMethod method)
         {
