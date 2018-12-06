@@ -4,6 +4,12 @@ namespace SlackApi.Methods
 {
     public class ConversationsListMethod : Method 
     { 
+        /// <summary>
+        /// Initializes a new instance of the <cref="ConversationsListMethod" /> class.
+        /// </summary>
+        public ConversationsListMethod() 
+            : base (RateLimit.Tier2) { }
+
         public string Types
         {
             set

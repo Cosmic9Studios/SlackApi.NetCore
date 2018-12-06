@@ -8,7 +8,30 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  Major: '2'
+  Minor: '0'
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: pack
+    configuration: 'release'
+    packagesToPack: 'SlackApi.NetCore.csproj'
+    versioningScheme: byBuildNumber
+    majorVersion: '$(Major)'
+    minorVersion: '$(Minor)'
+  
+
+- task: DotNetCoreCLI@2
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: push
+    nuGetFeedType: internal
+    publishVstsFeed: 'NugetOfficial'
+    
+    
+    

@@ -4,7 +4,12 @@ namespace SlackApi.Methods
 {
     public class ReactionsAddMethod : Method
     {
+        /// <summary>
+        /// Initializes a new instance of the <cref="ReactionsAddMethod" /> class.
+        /// </summary>
+        /// <param name="reactionName">The reaction (emoji) name.</param>
         public ReactionsAddMethod(string reactionName)
+            : base (RateLimit.Tier3)
         {
             Parameters.Add(new KeyValuePair<string, string>("name", reactionName));
         }

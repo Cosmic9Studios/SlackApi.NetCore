@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SlackApi;
+using SlackApi.Clients;
 using SlackApi.Methods;
 using SlackApi.Responses;
 
@@ -27,18 +28,15 @@ namespace CallAPIMethods
         /// </summary>
         /// <param name="oauthAccessMethod">OAuth access method options.</param>
         /// <returns>Client that will allow taking authorized actions on behalf of the user.</returns>
-        private static async Task<SlackClient> AuthorizeClient(OauthAccessMethod oauthAccessMethod)
+        private static async Task<SlackWebClient> AuthorizeClient(OauthAccessMethod oauthAccessMethod)
         {
-            var tempClient = new SlackClient("");
-            var oauthResponse = await tempClient.CallApiMethod<OauthAccessResponse>(oauthAccessMethod);
-            
-            return new SlackClient(oauthResponse.AccessToken);
+            return await SlackWebClientFactory.CreateWebClient("userId", oauthAccessMethod);
         }
 
         /// <summary>
         /// Check the client's basic authentication and identity information.
         /// </summary>
-        private static async Task TestAuth(ISlackClient slackClient)
+        private static async Task TestAuth(ISlackWebClient slackClient)
         {
             var authTestResponse = await slackClient.CallApiMethod<AuthTestReponse>(new AuthTestMethod());
 
