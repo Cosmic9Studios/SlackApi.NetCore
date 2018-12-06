@@ -4,7 +4,8 @@ namespace SlackApi.Methods
 {
     public class ConversationsHistoryMethod : Method
     {
-        public ConversationsHistoryMethod(string channel)
+        public ConversationsHistoryMethod(string channel) 
+            : base(RateLimit.Tier3)
         {
             Parameters.Add(new KeyValuePair<string, string>("channel", channel));
         }
