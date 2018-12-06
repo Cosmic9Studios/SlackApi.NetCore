@@ -10,6 +10,7 @@ variables:
   buildConfiguration: 'Release'
   Major: '2'
   Minor: '0'
+  Patch: '0'
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
@@ -21,9 +22,10 @@ steps:
     command: pack
     configuration: 'release'
     packagesToPack: 'SlackApi.NetCore.csproj'
-    versioningScheme: byBuildNumber
+    versioningScheme: byPrereleaseNumber
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
+    patchVersion: '$(Patch)'
   
 
 - task: DotNetCoreCLI@2
