@@ -7,11 +7,8 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-  group: Api-Keys 
+- group: Api-Keys 
   buildConfiguration: 'Release'
-  Major: '2'
-  Minor: '0'
-  Patch: '0'
 
 
 steps:
@@ -20,6 +17,10 @@ steps:
 
 - task: DotNetCoreCLI@2
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  variables: 
+    Major: '2'
+    Minor: '0'
+    Patch: '0'
   inputs:
     command: pack
     configuration: '$(buildConfiguration)'
