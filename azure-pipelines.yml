@@ -7,11 +7,12 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
+  - group: Api-Keys
   buildConfiguration: 'Release'
   Major: '2'
   Minor: '0'
   Patch: '0'
-- group: Api-Keys
+
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
