@@ -8,7 +8,6 @@ pool:
 
 variables:
 - group: Api-Keys 
-  buildConfiguration: 'Release'
 
 
 steps:
@@ -17,18 +16,14 @@ steps:
 
 - task: DotNetCoreCLI@2
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  variables: 
-    Major: '2'
-    Minor: '0'
-    Patch: '0'
   inputs:
     command: pack
     configuration: '$(buildConfiguration)'
     packagesToPack: 'SlackApi.NetCore.csproj'
     versioningScheme: byPrereleaseNumber
-    majorVersion: '$(Major)'
-    minorVersion: '$(Minor)'
-    patchVersion: '$(Patch)'
+    majorVersion: '2'
+    minorVersion: '0'
+    patchVersion: '0'
   
 - script: dotnet nuget push *.nupkg -k $(NUGET_KEY) -s nuget.org
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
