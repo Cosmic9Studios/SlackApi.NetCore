@@ -7,8 +7,10 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-- group: Api-Keys 
-
+  buildConfiguration: 'Release'
+  Major: '2'
+  Minor: '0'
+  Patch: '0'
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
@@ -21,12 +23,15 @@ steps:
     configuration: '$(buildConfiguration)'
     packagesToPack: 'SlackApi.NetCore.csproj'
     versioningScheme: byPrereleaseNumber
-    majorVersion: '2'
-    minorVersion: '0'
-    patchVersion: '0'
+    majorVersion: '$(Major)'
+    minorVersion: '$(Minor)'
+    patchVersion: '$(Patch)'
   
-- script: dotnet nuget push *.nupkg -k $(NUGET_KEY) -s nuget.org
+
+- task: DotNetCoreCLI@2
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    
-    
+  inputs:
+    command: push
+    nuGetFeedType: internal
+    publishVstsFeed: 'NugetOfficial'
     
