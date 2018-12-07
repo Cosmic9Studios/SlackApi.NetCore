@@ -8,10 +8,12 @@ pool:
 
 variables:
 - group: Api-Keys
-- buildConfiguration: 'Release'
-- Major: '2'
-- Minor: '0'
-- Patch: '0'
+
+variables: 
+  buildConfiguration: 'Release'
+  Major: '2'
+  Minor: '0'
+  Patch: '0'
 
 
 steps:
