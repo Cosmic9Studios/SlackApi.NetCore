@@ -32,6 +32,7 @@ steps:
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     command: push
-    nuGetFeedType: internal
-    publishVstsFeed: 'NugetOfficial'
+    nuGetFeedType: external
+    publishFeedCredentials: 'NugetOfficial'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
     
