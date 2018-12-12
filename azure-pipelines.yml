@@ -31,8 +31,7 @@ steps:
 - task: DotNetCoreCLI@2
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    command: push
-    nuGetFeedType: external
-    publishFeedCredentials: 'NugetOfficial'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    command: custom
+    custom: nuget
+    arguments: 'push $(Build.ArtifactStagingDirectory)/**/*.nupkg -k NUGET_KEY -s nuget.org'
     
