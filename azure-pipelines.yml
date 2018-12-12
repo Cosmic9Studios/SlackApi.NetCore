@@ -33,5 +33,5 @@ steps:
   inputs:
     command: custom
     custom: nuget
-    arguments: 'push $(Build.ArtifactStagingDirectory)/**/*.nupkg -k NUGET_KEY -s nuget.org'
+    arguments: 'push $(Build.ArtifactStagingDirectory)/**/*.nupkg -k $(NUGET_KEY) -s nuget.org'
     
