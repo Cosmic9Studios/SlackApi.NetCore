@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 using PureWebSockets;
-using RestSharp;
 using SlackApi.Events;
 
 namespace SlackApi.Clients
@@ -16,7 +18,7 @@ namespace SlackApi.Clients
         #region Fields.
         ///
         //////////////////////////////////
-        private PureWebSocket slackSocket;
+        private ClientWebSocket client = new ClientWebSocket();
         private Dictionary<string, KeyValuePair<Type, Delegate>> eventCallbacks;
         private bool isActive = false;
         private Timer timer;
@@ -32,30 +34,65 @@ namespace SlackApi.Clients
         }
         #endregion
 
+        private async Task ProcessMessage(ClientWebSocket client)
+        {
+            WebSocketReceiveResult result;
+            var message = new ArraySegment<byte>(new byte[4096]);
+            do 
+            {
+                result = await client.ReceiveAsync(message, CancellationToken.None);
+                if (result.MessageType != WebSocketMessageType.Text)
+                {
+                    break;
+                }
+
+                var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
+                string receivedMessage = Encoding.UTF8.GetString(messageBytes);
+
+                timer?.Change(TimeSpan.Zero, TimeSpan.FromSeconds(4));
+                Event slackEvent;
+
+                try
+                {
+                    slackEvent = JsonConvert.DeserializeObject<Event>(receivedMessage); 
+                }
+                catch (JsonReaderException)
+                {
+                    var encodedMessage = HttpUtility.JavaScriptStringEncode(receivedMessage);
+                    slackEvent = JsonConvert.DeserializeObject<Event>(receivedMessage); 
+                }
+
+                if (slackEvent.Type == null)
+                {
+                    return;
+                }
+
+                if (eventCallbacks.TryGetValue(slackEvent.Type, out var callback))
+                {
+                    object eventData = JsonConvert.DeserializeObject(receivedMessage, callback.Key);
+                    callback.Value.DynamicInvoke(eventData);
+                }
+            } 
+            while (!result.EndOfMessage);
+        }
+        
         #region ISlackRtmClient Interface.
         /// <summary>
         /// Connects to the slack client.
         /// </summary>
         /// <param name="socketUrl">The socket address to connect to.</param>
-        public void Connect(string socketUrl)
+        public async Task Connect(string socketUrl)
         {
-            slackSocket = new PureWebSocket(socketUrl, new ReconnectStrategy(10000, 60000));
-            slackSocket.OnStateChanged += Ws_OnStateChanged;
-            slackSocket.OnMessage += Ws_OnMessage;
-            slackSocket.OnClosed += Ws_OnClosed;
-
-            slackSocket.Connect();
+            await client.ConnectAsync(new Uri(socketUrl), CancellationToken.None);
+            await Task.Factory.StartNew(async () => 
+            {
+                while (true) 
+                {
+                    await ProcessMessage(client);
+                }
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             isActive = true;
-
-            timer = new Timer(
-                e => {
-                    slackSocket.Send(@"{""id"": 1234, ""type"": ""ping""}");
-                },
-                null, 
-                TimeSpan.Zero, 
-                TimeSpan.FromSeconds(4)
-            );
         }
 
         /// <summary>
@@ -64,7 +101,7 @@ namespace SlackApi.Clients
         public void Disconnect()
         {
             isActive = false;
-            slackSocket.Disconnect();
+            client.Dispose();
             eventCallbacks = null;
         }
 
@@ -109,46 +146,6 @@ namespace SlackApi.Clients
             identity = identity.Substring(0, identity.Length - 1);
 
             return identity;
-        }
-        #endregion
-
-        #region Event Methods.
-        private void Ws_OnClosed(WebSocketCloseStatus reason)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{DateTime.Now} Connection Closed: {reason}");
-            Console.ResetColor();
-            Console.WriteLine("");
-            Console.ReadLine();
-
-            if (isActive)
-            {
-                slackSocket.Connect();
-            }
-        }
-
-        private void Ws_OnMessage(string message)
-        {
-            timer?.Change(TimeSpan.Zero, TimeSpan.FromSeconds(4));
-            var slackEvent = JsonConvert.DeserializeObject<Event>(message); 
-            if (slackEvent.Type == null)
-            {
-                return;
-            }
-
-            if (eventCallbacks.TryGetValue(slackEvent.Type, out var callback))
-            {
-                object eventData = JsonConvert.DeserializeObject(message, callback.Key);
-                callback.Value.DynamicInvoke(eventData);
-            }
-        }
-
-        private void Ws_OnStateChanged(WebSocketState newState, WebSocketState prevState)
-        {
-            /* Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{DateTime.Now} Status changed from {prevState} to {newState}");
-            Console.ResetColor();
-            Console.WriteLine(""); */
         }
         #endregion
     }

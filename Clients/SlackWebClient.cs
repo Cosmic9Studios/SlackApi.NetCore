@@ -3,30 +3,38 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PureWebSockets;
-using RestSharp;
+using Flurl;
+using Flurl.Http;
 using SlackApi.Models;
 using SlackApi.Responses;
+using System.Net.Http;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Dynamic;
+using Newtonsoft.Json.Linq;
 
 namespace SlackApi.Clients
 {
     public class SlackWebClient : ISlackWebClient
     {
         #region Fields. 
+        private static HttpClient client = new HttpClient();
+
         ///
         //////////////////////////////////
-        private RestClient restClient;
         private SlackUser user;
         // [TeamId:MethodName][{current time, target time}]
-        private static Dictionary<string, KeyValuePair<Stopwatch, int>> blockedMethods;
+        private static ConcurrentDictionary<string, KeyValuePair<Stopwatch, int>> blockedMethods;
         #endregion
 
         #region Constructor
         internal SlackWebClient() 
         { 
-            blockedMethods = new Dictionary<string, KeyValuePair<Stopwatch, int>>();
+            blockedMethods = new ConcurrentDictionary<string, KeyValuePair<Stopwatch, int>>();
         }
 
         /// <summary>
@@ -35,7 +43,6 @@ namespace SlackApi.Clients
         public SlackWebClient(SlackUser user) : this()
         {
             this.user = user;
-            restClient = new RestClient("https://slack.com/api");
         }
         #endregion
 
@@ -58,14 +65,14 @@ namespace SlackApi.Clients
                     await Task.Delay(TimeSpan.FromSeconds(timeLeft));
                 }
                 
-                blockedMethods.Remove(blockKey);
+                blockedMethods.TryRemove(blockKey, out var dic);
             }
         
-            var request = new RestRequest($"{methodName}");
+            var parameters = new Dictionary<string, string>();
 
             if (!String.IsNullOrEmpty(user.Token))
             {
-                request.AddParameter("token", user.Token);
+                parameters["token"] = user.Token;
             }
 
             foreach (var parameter in method.Parameters)
@@ -74,12 +81,17 @@ namespace SlackApi.Clients
                 {
                     continue;
                 }
-                request.AddParameter(parameter.Key, parameter.Value);
+                parameters[parameter.Key] = parameter.Value;
             }
-            var result = restClient.Execute(request);
+
+            var result = await "https://slack.com/api"
+                .AllowHttpStatus("429")
+                .AppendPathSegment(methodName)
+                .PostAsync(new FormUrlEncodedContent(parameters)); 
+
             if ((int)result.StatusCode == 429)
             {
-                var retryAfter = result.Headers.FirstOrDefault(x => x.Name == "Retry-After");
+                var retryAfter = result.Headers.FirstOrDefault(x => x.Key == "Retry-After");
                 if (!int.TryParse(retryAfter.Value.ToString(), out var retrySeconds))
                 {
                     retrySeconds = 60;
@@ -90,9 +102,9 @@ namespace SlackApi.Clients
                 
                 return await CallApiMethod<T>(method);
             }
-
-            var taskResponse = JsonConvert.DeserializeObject<T>(result.Content); 
-            return taskResponse;
+                
+            var resultString = await result.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(resultString);
         }
         #endregion
 

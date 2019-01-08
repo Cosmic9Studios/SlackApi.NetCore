@@ -23,7 +23,7 @@ namespace BindRTMEvents
 
             if (connectionResponse.Ok)
             {
-                slackClient.Connect(connectionResponse.Url);
+                slackClient.Connect("test", connectionResponse.Url);
                 slackClient.BindEvent<ReactionAddedEvent>(ReactionAddedCallback);
                 slackClient.BindEvent<ReactionRemovedEvent>(ReactionRemovedCallback);
 

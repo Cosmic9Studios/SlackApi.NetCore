@@ -12,7 +12,7 @@ namespace SlackApi.Clients
         /// <summary>
         /// Connects to the slack api.
         /// </summary>
-        void Connect(string socketUrl);
+        Task Connect(string socketUrl);
 
         /// <summary>
         /// Disconnects from the slack api.
