@@ -54,14 +54,14 @@ namespace SlackApi.Clients
         public async Task<T> CallApiMethod<T>(Methods.Method method, bool retryOnFailure = true) where T: Response
         {
             string methodName = GetMethodName(method.GetType());
-            string blockKey = $"{user.TeamId}:{methodName}";
+            string blockKey = $"{User.TeamId}:{methodName}";
 
             if (blockedMethods.TryGetValue(blockKey, out var time))
             {
                 var timeLeft = time.Value - time.Key.Elapsed.Seconds;
                 if (timeLeft > 0)
                 {
-                    System.Console.WriteLine($"User {user.Id} on Team {user.TeamId} blocked for {timeLeft} on method {methodName}");
+                    System.Console.WriteLine($"User {User.Id} on Team {User.TeamId} blocked for {timeLeft} on method {methodName}");
                     await Task.Delay(TimeSpan.FromSeconds(timeLeft));
                 }
                 
@@ -70,9 +70,9 @@ namespace SlackApi.Clients
         
             var parameters = new Dictionary<string, string>();
 
-            if (!String.IsNullOrEmpty(user.Token))
+            if (!String.IsNullOrEmpty(User.Token))
             {
-                parameters["token"] = user.Token;
+                parameters["token"] = User.Token;
             }
 
             foreach (var parameter in method.Parameters)

@@ -20,8 +20,6 @@ namespace SlackApi.Clients
         //////////////////////////////////
         private ClientWebSocket client = new ClientWebSocket();
         private Dictionary<string, KeyValuePair<Type, Delegate>> eventCallbacks;
-        private bool isActive = false;
-        private Timer timer;
         #endregion
 
         #region Constructor
@@ -48,8 +46,7 @@ namespace SlackApi.Clients
 
                 var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
                 string receivedMessage = Encoding.UTF8.GetString(messageBytes);
-
-                timer?.Change(TimeSpan.Zero, TimeSpan.FromSeconds(4));
+                
                 Event slackEvent;
 
                 try
@@ -91,8 +88,6 @@ namespace SlackApi.Clients
                     await ProcessMessage(client);
                 }
             }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
-            isActive = true;
         }
 
         /// <summary>
@@ -100,7 +95,6 @@ namespace SlackApi.Clients
         /// </summary>
         public void Disconnect()
         {
-            isActive = false;
             client.Dispose();
             eventCallbacks = null;
         }
