@@ -13,6 +13,6 @@ namespace SlackApi.Clients
         /// Calls a web api method.
         /// </summary>
         /// <param name="method">The method to invoke.</param>
-        Task<T> CallApiMethod<T>(Method method) where T: Response;
+        Task<T> CallApiMethod<T>(Method method, bool retryOnFailure) where T: Response;
     }
 }

@@ -5,7 +5,7 @@ namespace SlackApi.Models
     public class SlackUser
     {
         /// <summary>
-        /// Initializes an instance ode the <cref="SlackUser" /> class.
+        /// Initializes an instance of the <cref="SlackUser" /> class.
         /// </summary>
         /// <param name="token">The users token.</param>
         /// <param name="id">The users id.</param>

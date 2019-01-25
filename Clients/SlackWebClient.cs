@@ -23,12 +23,12 @@ namespace SlackApi.Clients
     {
         #region Fields. 
         private static HttpClient client = new HttpClient();
-
-        ///
-        //////////////////////////////////
-        private SlackUser user;
         // [TeamId:MethodName][{current time, target time}]
         private static ConcurrentDictionary<string, KeyValuePair<Stopwatch, int>> blockedMethods;
+        #endregion
+
+        #region Properties
+        public SlackUser User { get; }
         #endregion
 
         #region Constructor
@@ -42,7 +42,7 @@ namespace SlackApi.Clients
         /// </summary>
         public SlackWebClient(SlackUser user) : this()
         {
-            this.user = user;
+            User = user;
         }
         #endregion
 
@@ -51,7 +51,7 @@ namespace SlackApi.Clients
         /// Calls a web api method.
         /// </summary>
         /// <param name="method">The method to call.</param>
-        public async Task<T> CallApiMethod<T>(Methods.Method method) where T: Response
+        public async Task<T> CallApiMethod<T>(Methods.Method method, bool retryOnFailure = true) where T: Response
         {
             string methodName = GetMethodName(method.GetType());
             string blockKey = $"{user.TeamId}:{methodName}";
@@ -89,7 +89,7 @@ namespace SlackApi.Clients
                 .AppendPathSegment(methodName)
                 .PostAsync(new FormUrlEncodedContent(parameters)); 
 
-            if ((int)result.StatusCode == 429)
+            if ((int)result.StatusCode == 429 && retryOnFailure)
             {
                 var retryAfter = result.Headers.FirstOrDefault(x => x.Key == "Retry-After");
                 if (!int.TryParse(retryAfter.Value.ToString(), out var retrySeconds))
