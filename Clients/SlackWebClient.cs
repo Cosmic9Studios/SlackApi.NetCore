@@ -119,13 +119,14 @@ namespace SlackApi.Clients
             {
                 split.RemoveAt(split.Count - 1);
             }
-            
+
+            identity += $"{split[0].ToLower()}.{split[1].ToLower()}";
+            split.RemoveRange(0, 2);
+
             foreach (var name in split)
             {
-                identity += name.ToLower() + ".";
+                identity += name;
             }
-
-            identity = identity.Substring(0, identity.Length - 1);
 
             return identity;
         }
